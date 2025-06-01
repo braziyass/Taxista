@@ -390,4 +390,70 @@ public class TripManager {
             e.printStackTrace();
         }
     }
+
+    // Update trip (admin only)
+    public boolean updateTrip(Trip trip) {
+        try {
+            PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE trips SET driver_username = ?, departure = ?, destination = ?, date_time = ?, " +
+                "available_seats = ?, price_per_seat = ?, description = ?, status = ? WHERE id = ?"
+            );
+            stmt.setString(1, trip.getDriver().getUsername());
+            stmt.setString(2, trip.getDeparture());
+            stmt.setString(3, trip.getDestination());
+            stmt.setString(4, trip.getDateTime().format(formatter));
+            stmt.setInt(5, trip.getAvailableSeats());
+            stmt.setDouble(6, trip.getPricePerSeat());
+            stmt.setString(7, trip.getDescription());
+            stmt.setString(8, trip.getStatus().toString());
+            stmt.setString(9, trip.getId());
+            
+            int rowsAffected = stmt.executeUpdate();
+            stmt.close();
+            
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating trip: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Delete trip (admin only)
+    public boolean deleteTrip(String tripId) {
+        try {
+            connection.setAutoCommit(false);
+            
+            // First delete from trip_passengers
+            PreparedStatement deletePassengersStmt = connection.prepareStatement(
+                "DELETE FROM trip_passengers WHERE trip_id = ?"
+            );
+            deletePassengersStmt.setString(1, tripId);
+            deletePassengersStmt.executeUpdate();
+            deletePassengersStmt.close();
+            
+            // Then delete the trip
+            PreparedStatement deleteTripStmt = connection.prepareStatement(
+                "DELETE FROM trips WHERE id = ?"
+            );
+            deleteTripStmt.setString(1, tripId);
+            int rowsAffected = deleteTripStmt.executeUpdate();
+            deleteTripStmt.close();
+            
+            connection.commit();
+            connection.setAutoCommit(true);
+            
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            System.err.println("Error deleting trip: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

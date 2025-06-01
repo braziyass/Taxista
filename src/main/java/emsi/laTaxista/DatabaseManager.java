@@ -22,6 +22,9 @@ public class DatabaseManager {
             // Create tables if they don't exist
             createTables();
             
+            // Migrate database if needed
+            migrateDatabase();
+            
             System.out.println("Database connection established successfully.");
         } catch (ClassNotFoundException | SQLException e) {
             System.err.println("Database initialization error: " + e.getMessage());
@@ -78,6 +81,34 @@ public class DatabaseManager {
         addDemoDataIfNeeded();
     }
     
+    // Migrate database schema if needed
+    private static void migrateDatabase() {
+        try {
+            // Check if role column exists in users table
+            DatabaseMetaData meta = connection.getMetaData();
+            ResultSet columns = meta.getColumns(null, null, "users", "role");
+            boolean roleColumnExists = columns.next();
+            columns.close();
+            
+            if (!roleColumnExists) {
+                System.out.println("Migrating database: Adding 'role' column to users table");
+                Statement stmt = connection.createStatement();
+                
+                // Add role column with default value 'USER'
+                stmt.execute("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'USER'");
+                
+                // Set admin user role
+                stmt.execute("UPDATE users SET role = 'ADMIN' WHERE username = 'admin'");
+                
+                stmt.close();
+                System.out.println("Database migration completed successfully");
+            }
+        } catch (SQLException e) {
+            System.err.println("Database migration error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     // Add demo data if tables are empty
     private static void addDemoDataIfNeeded() {
         try {
@@ -91,7 +122,7 @@ public class DatabaseManager {
             if (userCount == 0) {
                 // Add demo users
                 PreparedStatement pstmt = connection.prepareStatement(
-                    "INSERT INTO users (username, email, password, phone) VALUES (?, ?, ?, ?)"
+                    "INSERT INTO users (username, email, password, phone, role) VALUES (?, ?, ?, ?, ?)"
                 );
                 
                 // Admin user
@@ -99,20 +130,23 @@ public class DatabaseManager {
                 pstmt.setString(2, "admin@covoiturage.com");
                 pstmt.setString(3, "admin");
                 pstmt.setString(4, "123456789");
+                pstmt.setString(5, "ADMIN");
                 pstmt.executeUpdate();
                 
-                // John user
-                pstmt.setString(1, "john");
-                pstmt.setString(2, "john@email.com");
+                // yassine user
+                pstmt.setString(1, "yassine");
+                pstmt.setString(2, "yassine@email.com");
                 pstmt.setString(3, "password");
                 pstmt.setString(4, "987654321");
+                pstmt.setString(5, "USER");
                 pstmt.executeUpdate();
                 
-                // Marie user
-                pstmt.setString(1, "marie");
-                pstmt.setString(2, "marie@email.com");
+                // simo user
+                pstmt.setString(1, "sino");
+                pstmt.setString(2, "simo@email.com");
                 pstmt.setString(3, "password");
                 pstmt.setString(4, "555666777");
+                pstmt.setString(5, "USER");
                 pstmt.executeUpdate();
                 
                 pstmt.close();

@@ -1,5 +1,6 @@
 package emsi.laTaxista;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ public class CovoiturageApp extends JFrame {
     private DashboardPanel dashboardPanel;
     private CreateTripPanel createTripPanel;
     private SearchTripsPanel searchTripsPanel;
+    private AdminDashboardPanel adminDashboardPanel;
     
     public CovoiturageApp() {
         userManager = new UserManager();
@@ -37,12 +39,14 @@ public class CovoiturageApp extends JFrame {
         dashboardPanel = new DashboardPanel(this);
         createTripPanel = new CreateTripPanel(this);
         searchTripsPanel = new SearchTripsPanel(this);
+        adminDashboardPanel = new AdminDashboardPanel(this);
         
         // Add panels to card layout
         mainPanel.add(loginPanel, "LOGIN");
         mainPanel.add(dashboardPanel, "DASHBOARD");
         mainPanel.add(createTripPanel, "CREATE_TRIP");
         mainPanel.add(searchTripsPanel, "SEARCH_TRIPS");
+        mainPanel.add(adminDashboardPanel, "ADMIN_DASHBOARD");
         
         add(mainPanel);
     }
@@ -63,8 +67,13 @@ public class CovoiturageApp extends JFrame {
         User user = userManager.authenticate(username, password);
         if (user != null) {
             currentUser = user;
-            dashboardPanel.updateUserInfo(user);
-            showPanel("DASHBOARD");
+            if (user.isAdmin()) {
+                adminDashboardPanel.updateUserInfo(user);
+                showPanel("ADMIN_DASHBOARD");
+            } else {
+                dashboardPanel.updateUserInfo(user);
+                showPanel("DASHBOARD");
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Invalid credentials!", "Login Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -89,6 +98,10 @@ public class CovoiturageApp extends JFrame {
     
     public TripManager getTripManager() {
         return tripManager;
+    }
+
+    public UserManager getUserManager() {
+        return userManager;
     }
     
     public void refreshTrips() {
