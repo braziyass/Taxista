@@ -19,6 +19,8 @@ public class UserEditDialog extends JDialog {
     private JComboBox<User.UserRole> roleComboBox;
     private JButton saveButton;
     private JButton cancelButton;
+    private JButton showPasswordButton;
+    private boolean passwordVisible = false;
     
     public UserEditDialog(AdminDashboardPanel parent, User user) {
         super((Frame) SwingUtilities.getWindowAncestor(parent), 
@@ -49,7 +51,9 @@ public class UserEditDialog extends JDialog {
         
         saveButton = new JButton("Save");
         cancelButton = new JButton("Cancel");
+        showPasswordButton = new JButton("👁");
         
+        // Style buttons
         saveButton.setBackground(new Color(60, 179, 113));
         saveButton.setForeground(Color.black);
         saveButton.setFocusPainted(false);
@@ -57,6 +61,14 @@ public class UserEditDialog extends JDialog {
         cancelButton.setBackground(new Color(220, 20, 60));
         cancelButton.setForeground(Color.black);
         cancelButton.setFocusPainted(false);
+        
+        // Style show password button
+        showPasswordButton.setBackground(new Color(70, 130, 180));
+        showPasswordButton.setForeground(Color.black);
+        showPasswordButton.setFocusPainted(false);
+        showPasswordButton.setPreferredSize(new Dimension(40, 25));
+        showPasswordButton.setToolTipText("Show/Hide Password");
+        showPasswordButton.setFont(new Font("Arial", Font.PLAIN, 12));
     }
     
     private void layoutComponents() {
@@ -68,43 +80,45 @@ public class UserEditDialog extends JDialog {
         // Username
         gbc.gridx = 0; gbc.gridy = 0;
         add(new JLabel("Username:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 2;
         add(usernameField, gbc);
         
         // Email
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
         add(new JLabel("Email:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 2;
         add(emailField, gbc);
         
-        // Password
-        gbc.gridx = 0; gbc.gridy = 2;
+        // Password with show/hide button
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1;
         add(new JLabel("Password:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 1;
         add(passwordField, gbc);
+        gbc.gridx = 2; gbc.gridwidth = 1;
+        add(showPasswordButton, gbc);
         
         // Phone
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1;
         add(new JLabel("Phone:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 2;
         add(phoneField, gbc);
         
         // Rating
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1;
         add(new JLabel("Rating:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 2;
         add(ratingSpinner, gbc);
         
         // Total Trips
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 1;
         add(new JLabel("Total Trips:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 2;
         add(tripsSpinner, gbc);
         
         // Role
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 1;
         add(new JLabel("Role:"), gbc);
-        gbc.gridx = 1;
+        gbc.gridx = 1; gbc.gridwidth = 2;
         add(roleComboBox, gbc);
         
         // Buttons
@@ -112,7 +126,7 @@ public class UserEditDialog extends JDialog {
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
         
-        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(buttonPanel, gbc);
     }
@@ -121,9 +135,26 @@ public class UserEditDialog extends JDialog {
         // Event listeners for buttons
         saveButton.addActionListener(this::saveUser);
         cancelButton.addActionListener(e -> dispose());
+        showPasswordButton.addActionListener(this::togglePasswordVisibility);
         
         // Set save button as default button (Enter key)
         getRootPane().setDefaultButton(saveButton);
+    }
+    
+    private void togglePasswordVisibility(ActionEvent e) {
+        if (passwordVisible) {
+            // Hide password
+            passwordField.setEchoChar('•');
+            showPasswordButton.setText("👁");
+            showPasswordButton.setToolTipText("Show Password");
+            passwordVisible = false;
+        } else {
+            // Show password
+            passwordField.setEchoChar((char) 0);
+            showPasswordButton.setText("🙈");
+            showPasswordButton.setToolTipText("Hide Password");
+            passwordVisible = true;
+        }
     }
     
     private void populateFields(User user) {

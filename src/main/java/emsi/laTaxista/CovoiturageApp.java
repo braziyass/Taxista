@@ -52,7 +52,7 @@ public class CovoiturageApp extends JFrame {
     }
     
     private void setupFrame() {
-        setTitle("Covoiturage - Carpooling App");
+        setTitle("Covoiturage - Taxista");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);

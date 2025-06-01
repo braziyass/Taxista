@@ -137,7 +137,7 @@ public class TripEditDialog extends JDialog {
         JButton saveButton = new JButton("Save");
         JButton cancelButton = new JButton("Cancel");
         
-        saveButton.setBackground(Color.white);
+        saveButton.setBackground(new Color(60, 179, 113));
         saveButton.setForeground(Color.black);
         saveButton.setFocusPainted(false);
         
