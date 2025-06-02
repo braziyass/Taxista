@@ -91,7 +91,7 @@ public class LoginPanel extends JPanel {
         add(buttonPanel, gbc);
         
         // Demo info
-        JLabel demoLabel = new JLabel("<html><center>Demo accounts:<br/>admin/admin or john/password</center></html>");
+        JLabel demoLabel = new JLabel("<html><center>Demo accounts:<br/>admin/admin or yassine/password</center></html>");
         demoLabel.setFont(new Font("Arial", Font.PLAIN, 12));
         demoLabel.setForeground(Color.GRAY);
         gbc.gridy = 5;
